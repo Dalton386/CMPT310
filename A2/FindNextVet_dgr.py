@@ -1,4 +1,4 @@
-from heapq import *
+from heapq import heappop,heappush
 
 
 def FindNextVet(assignment, vetset, remainval, csp):
