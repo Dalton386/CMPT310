@@ -1,6 +1,32 @@
 #!python3.4
 import sys
 from parser import *
+from heapq import heappop,heappush
+
+
+def FindNextVet_mrv(assignment, vetset, remainval):
+    vetheap = list()
+    vetlist = list()
+    for vet in vetset:
+        if vet not in assignment.keys():
+            heappush(vetheap,(len(remainval[vet]),vet))
+    vetlist.append(heappop(vetheap)[1])
+    while vetheap:
+        vetitr = heappop(vetheap)
+        if vetitr[0] == len(remainval[vetlist[0]]):
+            vetlist.append(vetitr[1])
+        else:
+            break
+
+    return vetlist
+
+
+def FindNextVet_dgr(assignment, vetset, csp):
+    vetheap = list()
+    for vet in vetset:
+        if vet not in assignment.keys():
+            heappush(vetheap,(- len(csp[vet]),vet))
+    return heappop(vetheap)[1]
 
 
 def BacktrackSearch():
@@ -12,7 +38,11 @@ def RecursiveBS(assignment):
     if len(assignment) == vertcnt :
         return assignment
     remainval = GetRV(assignment)
-    vet = FindNextVet(assignment,vetset,remainval,csp)
+    vetlist = FindNextVet_mrv(assignment,vetset,remainval)
+    if len(vetlist) == 1:
+        vet = vetlist[0]
+    else:
+        vet = FindNextVet_dgr(assignment,vetlist,csp)
     value = LCV(vet,remainval)
     for val in value:
         # if IsArcConsistency(vet,val):
@@ -57,10 +87,12 @@ def GetRV(assignment):
 
 failure = dict()
 csp = dict()
+answer = dict()
 vetset = list()
 
 if __name__ == '__main__':
     filename = input("please enter the data filename: ")
+    # filename = "textfile.txt"
     with open(filename, "r") as datafile:
         data = datafile.read().replace('\n', '')
 
@@ -71,16 +103,11 @@ if __name__ == '__main__':
     for item in csp.keys():
         vetset.append(item)
 
-    hmode = input('test with MRV: please enter \'m\'\n'
-                  'test with degree: please enter \'d\'\n')
-    if hmode == 'm':
-        from FindNextVet_mrv import *
-    elif hmode == 'd':
-        from FindNextVet_dgr import *
+    answer = BacktrackSearch()
+    if answer:
+        print("Note: each negative number means a kind of color")
+        print(answer)
     else:
-        print("the test mode is illegal")
-        sys.exit()
-
-    print(BacktrackSearch())
+        print("Cannot paint this map!")
 
 
