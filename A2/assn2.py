@@ -1,5 +1,5 @@
 #!python3.4
-import sys
+import time
 from parser import *
 from heapq import heappop,heappush
 
@@ -27,31 +27,6 @@ def FindNextVet_dgr(assignment, vetset, csp):
         if vet not in assignment.keys():
             heappush(vetheap,(- len(csp[vet]),vet))
     return heappop(vetheap)[1]
-
-
-def BacktrackSearch():
-    assignment = dict()
-    return RecursiveBS(assignment)
-
-
-def RecursiveBS(assignment):
-    if len(assignment) == vertcnt :
-        return assignment
-    remainval = GetRV(assignment)
-    vetlist = FindNextVet_mrv(assignment,vetset,remainval)
-    if len(vetlist) == 1:
-        vet = vetlist[0]
-    else:
-        vet = FindNextVet_dgr(assignment,vetlist,csp)
-    value = LCV(vet,remainval)
-    for val in value:
-        # if IsArcConsistency(vet,val):
-        assignment[vet] = val
-        result = RecursiveBS(assignment)
-        if result != failure:
-            return result
-        assignment.pop(vet,0)
-    return failure
 
 
 def LCV(vet,remainval):
@@ -85,14 +60,62 @@ def GetRV(assignment):
 
     return remainval
 
+
+def BacktrackSearch():
+    assignment = dict()
+    return RecursiveBS(assignment)
+
+
+def RecursiveBS(assignment):
+    if len(assignment) == vertcnt :
+        return assignment
+    remainval = GetRV(assignment)
+    vetlist = FindNextVet_mrv(assignment,vetset,remainval)
+    if len(vetlist) == 1:
+        vet = vetlist[0]
+    else:
+        vet = FindNextVet_dgr(assignment,vetlist,csp)
+    value = LCV(vet,remainval)
+    for val in value:
+        # if IsArcConsistency(vet,val):
+        assignment[vet] = val
+        result = RecursiveBS(assignment)
+        if result != failure:
+            return result
+        assignment.pop(vet,0)
+    return failure
+
+
+def naiveBacktrackSearch():
+    assignment = dict()
+    return RecursiveBS(assignment)
+
+
+def naiveRecursiveBS(assignment):
+    if len(assignment) == vertcnt :
+        return assignment
+    vet = vetset.pop()
+    value = csp[vet]
+    for val in value:
+        # if IsArcConsistency(vet,val):
+        assignment[vet] = val
+        result = RecursiveBS(assignment)
+        if result != failure:
+            return result
+        assignment.pop(vet,0)
+    return failure
+
+
 failure = dict()
 csp = dict()
 answer = dict()
+naive_answer = dict()
 vetset = list()
+REPEATTIME = 10000
 
 if __name__ == '__main__':
-    filename = input("please enter the data filename: ")
-    # filename = "textfile.txt"
+    # filename = input("please enter the data filename: ")
+    filename = "textfile.txt"
     with open(filename, "r") as datafile:
         data = datafile.read().replace('\n', '')
 
@@ -103,10 +126,29 @@ if __name__ == '__main__':
     for item in csp.keys():
         vetset.append(item)
 
-    answer = BacktrackSearch()
-    if answer:
+    startime = time.time()
+    for i in range(REPEATTIME):
+        vetset = list()
+        for item in csp.keys():
+            vetset.append(item)
+        answer = BacktrackSearch()
+    duratime = time.time() - startime
+
+    startime = time.time()
+    for i in range(REPEATTIME):
+        vetset = list()
+        for item in csp.keys():
+            vetset.append(item)
+        naive_answer = BacktrackSearch()
+    naive_duratime = time.time() - startime
+
+    if answer and naive_answer:
         print("Note: each negative number means a kind of color")
-        print(answer)
+        print("REPEATTIME is ", REPEATTIME)
+        print("with heuristic\n",answer)
+        print("time consumption: ",duratime)
+        print("without heuristic\n",naive_answer)
+        print("time consumption: ", naive_duratime)
     else:
         print("Cannot paint this map!")
 
