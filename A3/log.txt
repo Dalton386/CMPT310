@@ -1,0 +1,119 @@
+special cases
+1. the same header with several different bodies
+work well
+2. circle rules: p->q && q->p
+runtime error
+3. the header is conbined in the bodies: p ^ q -> p
+runtime error
+4. input multiple goals
+work well
+5. duplicate rules
+
+limitation:
+1. can only solve queries conjuncted with AND
+2. can only accept rules conjuncted with AND
+
+improvement:
+1. store reasoned subgoal as new rules to reduce redundent reasoning
+
+key point:
+all goals are conjuncted and have to be achieved simutanously. 
+
+attention:
+delete subgoals that contain header cannot be made
+
+
+INPUT:
+a
+p
+q p
+d
+g q j
+e f
+c f d
+c d g
+c e d
+b j
+a b c
+j
+
+OUTPUT:
+the goal is: a
+the KB is: 
+p
+p -> q
+d
+q ^ j -> g
+f -> e
+f ^ d -> c
+d ^ g -> c
+e ^ d -> c
+j -> b
+b ^ c -> a
+j
+the reasoning process is: 
+************************************************
+the next sub-goal is: a
+the possible valid rule is: b ^ c -> a
+the next sub-goal is: b
+the possible valid rule is: j -> b
+the next sub-goal is: c
+the possible valid rule is: f ^ d -> c
+the next sub-goal is: j
+the possible valid rule is: j
+the next sub-goal is: f
+cannot reason sub-goal
+cannot reason sub-goal
+the possible valid rule is: d ^ g -> c
+the next sub-goal is: d
+the possible valid rule is: d
+the next sub-goal is: g
+the possible valid rule is: q ^ j -> g
+the next sub-goal is: q
+the possible valid rule is: p -> q
+the next sub-goal is: j
+the possible valid rule is: j
+the next sub-goal is: p
+the possible valid rule is: p
+successfully inferred with rule: p
+successfully inferred with rule: j
+successfully inferred with rule: p -> q
+successfully inferred with rule: q ^ j -> g
+successfully inferred with rule: d
+successfully inferred with rule: d ^ g -> c
+successfully inferred with rule: j -> b
+successfully inferred with rule: b ^ c -> a
+************************************************
+Success: the goal can be reasoned from KB
+
+
+
+INPUT:
+r
+p
+q p
+r p q
+r s
+OUTPUT:
+the goal is: r
+the KB is: 
+p
+p -> q
+p ^ q -> r
+s -> r
+the reasoning process is: 
+************************************************
+the next sub-goal is: r
+the possible valid rule is: p ^ q -> r
+the next sub-goal is: p
+the possible valid rule is: p
+the next sub-goal is: q
+the possible valid rule is: p -> q
+the next sub-goal is: p
+the possible valid rule is: p
+successfully inferred with rule: p
+successfully inferred with rule: p -> q
+successfully inferred with rule: p
+successfully inferred with rule: p ^ q -> r
+************************************************
+Success: the goal can be reasoned from KB
